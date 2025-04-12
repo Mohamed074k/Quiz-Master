@@ -1,0 +1,125 @@
+<!--By Mohamed Elsayed :[www.linkedin.com/in/mohamed-elsayed-2623602a1]-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizMaster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <div class="hero">
+                <h1>QuizMaster</h1>
+                <p>Test your knowledge across various topics and challenge yourself!</p>
+            </div>
+            <button class="start-btn" id="startBtn">Start Quiz</button>
+        </div>
+
+        <!-- Configuration Screen -->
+        <div class="config-screen hidden" id="configScreen">
+            <h2>Quiz Settings</h2>
+            <div class="settings-card">
+                <div class="setting">
+                    <label for="category">Category:</label>
+                    <select id="category">
+                        <option value="9">General Knowledge</option>
+                        <option value="18">Science: Computers</option>
+                        <option value="21">Sports</option>
+                        <option value="23">History</option>
+                        <option value="11">Movies</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label for="difficulty">Difficulty:</label>
+                    <div class="difficulty-toggles">
+                        <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+                        <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+                        <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+                    </div>
+                </div>
+                <div class="setting">
+                    <label>Number of Questions:</label>
+                    <div class="question-count-selector">
+                        <button class="question-count-btn active" data-count="5">5</button>
+                        <button class="question-count-btn" data-count="10">10</button>
+                        <button class="question-count-btn" data-count="15">15</button>
+                        <button class="question-count-btn" data-count="20">20</button>
+                    </div>
+                </div>
+            </div>
+            <button class="start-quiz-btn" id="startQuizBtn">
+                <span class="btn-text">Begin Quiz</span>
+                <div class="spinner hidden"></div>
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="quiz-screen hidden" id="quizScreen">
+            <div class="quiz-header">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="quiz-info">
+                    <span class="question-count" id="questionCountDisplay">Question 1/10</span>
+                    <span class="timer" id="timer">15s</span>
+                </div>
+            </div>
+            
+            <div class="question-container" id="questionContainer" data-category="">
+                <h2 class="question" id="question"></h2>
+                <div class="options" id="options"></div>
+              </div>
+              
+              <div class="quiz-controls">
+                <button class="skip-btn" id="skipBtn">Skip Question</button>
+                <button class="next-btn hidden" id="nextBtn">Next Question</button>
+              </div>
+            </div>
+        <!-- Results Screen -->
+        <div class="results-screen hidden" id="resultsScreen">
+            <div class="results-card">
+                <div class="score-display">
+                    <h2>Your Score</h2>
+                    <div class="score-circle">
+                        <span id="scorePercentage">80%</span>
+                    </div>
+                    <p id="scoreText">Great job!</p>
+                </div>
+                
+                <div class="results-details">
+                    <h3>Summary</h3>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-value" id="correctAnswers">8</span>
+                            <span class="stat-label">Correct</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="wrongAnswers">2</span>
+                            <span class="stat-label">Wrong</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="skippedAnswers">0</span>
+                            <span class="stat-label">Skipped</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="retry-btn" id="retryBtn">Try Again</button>
+                    <button class="new-quiz-btn" id="newQuizBtn">New Quiz</button>
+                    <button class="share-btn" id="shareBtn">Share Results</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>
