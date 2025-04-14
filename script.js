@@ -549,7 +549,18 @@ score = 0;
         currentQuestionIndex = 0;
         score = 0;
         skipped = 0;
-        showQuestion();
+        
+        // Reset all counters
+        correctAnswers.textContent = '0';
+        wrongAnswers.textContent = '0';
+        skippedAnswers.textContent = '0';
+        
+        // Reset the progress bar
+        progressBar.style.width = '0%';
+        
+        // Immediately show the first question without animation
+        questionContainer.classList.remove('next-question', 'new-question');
+                showQuestion();
     }
     
     function shareResults() {
