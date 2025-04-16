@@ -46,129 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         amount: 5
     };
     
-    // Local questions fallback
-    const localQuestions = {
-        "9": {
-            "easy": [
-                {
-                    "question": "What is the capital of France?",
-                    "correct_answer": "Paris",
-                    "incorrect_answers": ["London", "Berlin", "Madrid"]
-                },
-                {
-                    "question": "Which planet is closest to the Sun?",
-                    "correct_answer": "Mercury",
-                    "incorrect_answers": ["Venus", "Earth", "Mars"]
-                }
-            ],
-            "medium": [
-                {
-                    "question": "In which year did World War II end?",
-                    "correct_answer": "1945",
-                    "incorrect_answers": ["1943", "1947", "1939"]
-                }
-            ],
-            "hard": [
-                {
-                    "question": "Who painted the Mona Lisa?",
-                    "correct_answer": "Leonardo da Vinci",
-                    "incorrect_answers": ["Pablo Picasso", "Vincent van Gogh", "Michelangelo"]
-                }
-            ]
-        },
-        "18": {
-            "easy": [
-                {
-                    "question": "What does CPU stand for?",
-                    "correct_answer": "Central Processing Unit",
-                    "incorrect_answers": ["Computer Processing Unit", "Central Processor Unit", "Computer Processor Unit"]
-                }
-            ],
-            "medium": [
-                {
-                    "question": "Which programming language is known as the 'language of the web'?",
-                    "correct_answer": "JavaScript",
-                    "incorrect_answers": ["Python", "Java", "C++"]
-                }
-            ],
-            "hard": [
-                {
-                    "question": "What does API stand for in programming?",
-                    "correct_answer": "Application Programming Interface",
-                    "incorrect_answers": ["Application Program Interface", "Automated Programming Interface", "Advanced Programming Interface"]
-                }
-            ]
-        },
-        "21": {
-            "easy": [
-                {
-                    "question": "Which country won the 2018 FIFA World Cup?",
-                    "correct_answer": "France",
-                    "incorrect_answers": ["Croatia", "Belgium", "England"]
-                }
-            ],
-            "medium": [
-                {
-                    "question": "In basketball, how many points is a free throw worth?",
-                    "correct_answer": "1",
-                    "incorrect_answers": ["2", "3", "4"]
-                }
-            ],
-            "hard": [
-                {
-                    "question": "Which tennis player has won the most Grand Slam titles?",
-                    "correct_answer": "Margaret Court",
-                    "incorrect_answers": ["Serena Williams", "Steffi Graf", "Roger Federer"]
-                }
-            ]
-        },
-        "23": {
-            "easy": [
-                {
-                    "question": "Who was the first president of the United States?",
-                    "correct_answer": "George Washington",
-                    "incorrect_answers": ["Thomas Jefferson", "Abraham Lincoln", "John Adams"]
-                }
-            ],
-            "medium": [
-                {
-                    "question": "In which year did the Titanic sink?",
-                    "correct_answer": "1912",
-                    "incorrect_answers": ["1905", "1918", "1923"]
-                }
-            ],
-            "hard": [
-                {
-                    "question": "Which ancient civilization built the Machu Picchu complex?",
-                    "correct_answer": "Incas",
-                    "incorrect_answers": ["Aztecs", "Mayans", "Egyptians"]
-                }
-            ]
-        },
-        "11": {
-            "easy": [
-                {
-                    "question": "Who played Jack Dawson in Titanic?",
-                    "correct_answer": "Leonardo DiCaprio",
-                    "incorrect_answers": ["Brad Pitt", "Tom Cruise", "Johnny Depp"]
-                }
-            ],
-            "medium": [
-                {
-                    "question": "Which movie won the first Academy Award for Best Picture?",
-                    "correct_answer": "Wings",
-                    "incorrect_answers": ["Sunrise", "The Jazz Singer", "Metropolis"]
-                }
-            ],
-            "hard": [
-                {
-                    "question": "Who directed the movie 'Pulp Fiction'?",
-                    "correct_answer": "Quentin Tarantino",
-                    "incorrect_answers": ["Martin Scorsese", "Steven Spielberg", "Christopher Nolan"]
-                }
-            ]
-        }
-    };
+    
     
     // Event Listeners
     startBtn.addEventListener('click', showConfigScreen);
@@ -205,14 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('active');
         quizConfig.difficulty = btn.dataset.difficulty;
         
-        // Adjust question count based on difficulty
-        if (quizConfig.difficulty === 'hard') {
-            questionCountBtns.forEach(btn => {
-                if (parseInt(btn.dataset.count) > 10) btn.disabled = true;
-            });
-        } else {
-            questionCountBtns.forEach(btn => btn.disabled = false);
-        }
+        // Remove the restriction for hard difficulty
+        questionCountBtns.forEach(btn => btn.disabled = false);
     }
     
     async function startQuiz() {
@@ -223,21 +95,19 @@ document.addEventListener('DOMContentLoaded', () => {
         spinner.classList.remove('hidden');
         startQuizBtn.disabled = true;
         skipped = 0;
-score = 0;
+        score = 0;
         
         try {
             // Get selected category
             const selectedCategory = categorySelect.value;
             const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
             
-            // Fetch questions from API with the selected category
-            const apiUrl = `https://opentdb.com/api.php?amount=${quizConfig.amount}&category=${selectedCategory}&difficulty=${quizConfig.difficulty}&type=multiple`;
-            const response = await fetch(apiUrl);
-            const data = await response.json();
-            
-            if (data.response_code === 0) {
-                questions = data.results.map(question => {
-                    // Format and shuffle answers
+            // Use local questions instead of API
+            if (window.quizQuestions[selectedCategory] && window.quizQuestions[selectedCategory][quizConfig.difficulty]) {
+                const categoryQuestions = window.quizQuestions[selectedCategory][quizConfig.difficulty];
+                const shuffledQuestions = shuffleArray([...categoryQuestions]).slice(0, quizConfig.amount);
+                
+                questions = shuffledQuestions.map(question => {
                     const answers = [...question.incorrect_answers, question.correct_answer];
                     return {
                         ...question,
@@ -250,59 +120,18 @@ score = 0;
                 configScreen.classList.add('hidden');
                 quizScreen.classList.remove('hidden');
                 currentQuestionIndex = 0;
-                score = 0;
                 showQuestion();
             } else {
-                // Fallback to local questions if API fails
-                await loadLocalQuestions(selectedCategory, categoryName);
+                throw new Error('No questions available for this category and difficulty');
             }
         } catch (error) {
-            console.error('Error fetching questions:', error);
-            // Fallback to local questions
-            const selectedCategory = categorySelect.value;
-            const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
-            await loadLocalQuestions(selectedCategory, categoryName);
+            console.error('Error starting quiz:', error);
+            alert('Failed to start quiz. Please try again.');
         } finally {
             // Reset button state
             btnText.classList.remove('hidden');
             spinner.classList.add('hidden');
             startQuizBtn.disabled = false;
-        }
-    }
-    
-    // Local questions fallback
-    async function loadLocalQuestions(categoryId, categoryName) {
-        try {
-            // Get questions for selected difficulty
-            const categoryQuestions = localQuestions[categoryId] || localQuestions["9"];
-            let difficultyQuestions = categoryQuestions[quizConfig.difficulty] || categoryQuestions.easy;
-            
-            // If not enough questions, use whatever we have
-            if (difficultyQuestions.length < quizConfig.amount) {
-                difficultyQuestions = difficultyQuestions.slice(0, quizConfig.amount);
-            } else {
-                // Shuffle and take the required amount
-                difficultyQuestions = shuffleArray(difficultyQuestions).slice(0, quizConfig.amount);
-            }
-            
-            questions = difficultyQuestions.map(question => {
-                const answers = [...question.incorrect_answers, question.correct_answer];
-                return {
-                    ...question,
-                    category: categoryName,
-                    answers: shuffleArray(answers),
-                    correct_answer: question.correct_answer
-                };
-            });
-            
-            configScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            currentQuestionIndex = 0;
-            score = 0;
-            showQuestion();
-        } catch (error) {
-            console.error('Error loading local questions:', error);
-            alert('Failed to load questions. Please try again later.');
         }
     }
     
